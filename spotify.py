@@ -4,10 +4,13 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+import numpy as np
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
@@ -69,5 +72,20 @@ def basic_scatter(df, column_x, column_y):
 
 basic_scatter(train_data, "danceability", "valence")
 
-plt.show()
 
+def elbow_method(df, column_x, column_y):
+    wcss=[]
+
+    for i in range(1,11):
+        kmeans= KMeans(n_clusters=i, init='k-means++', random_state=42)
+        kmeans.fit(df[[column_x, column_y]])
+
+        wcss.append(kmeans.inertia_)
+
+        plt.plot(range(1,11),wcss)
+        plt.xlabel('Number of clusters')
+        plt.ylabel('Inertia');
+
+elbow_method(train_data, "danceability", "valence")
+
+plt.show()

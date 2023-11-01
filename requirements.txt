@@ -2,3 +2,6 @@ spotipy
 pandas
 matplotlib
 python-dotenv
+sklearn
+numpy
+KMeans
