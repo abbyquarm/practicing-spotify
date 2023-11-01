@@ -70,7 +70,7 @@ def basic_scatter(df, column_x, column_y):
     plt.ylabel(column_y)
     plt.ylim([0,1]);
 
-basic_scatter(train_data, "danceability", "valence")
+#basic_scatter(train_data, "danceability", "valence")
 
 
 def elbow_method(df, column_x, column_y):
@@ -82,9 +82,10 @@ def elbow_method(df, column_x, column_y):
 
         wcss.append(kmeans.inertia_)
 
-        plt.plot(range(1,11),wcss)
-        plt.xlabel('Number of clusters')
-        plt.ylabel('Inertia');
+    plt.plot(range(1,11),wcss)
+    plt.title("Clustering")
+    plt.xlabel('Number of clusters')
+    plt.ylabel('Inertia');
 
 elbow_method(train_data, "danceability", "valence")
 
