@@ -89,4 +89,97 @@ def elbow_method(df, column_x, column_y):
 
 elbow_method(train_data, "danceability", "valence")
 
-plt.show()
+def kmeans_training_from_scratch(n_clusters, df, column_x, column_y)
+    initial_cluster_centroids = df[[column_x, column_y]].sample(n_clusters)
+    initial_cluster_centroids.reset_index(inplace=True, drop=True)
+
+    index_of_closest_cluster = []
+
+    for song_index, song_row in df[[column_x, column_y]].iterrows():
+
+        distances = {}
+
+        for centroid_index, centroid_row in initial_cluster_centroids.iterrows():
+            individual_x_distance = song_row[column_x] - centroid_row[column_x]
+            individual_y_distance = song_row[column_y] - centroid_row[column_y]
+            distances[centroid_index] = np.sqrt(individual_x_distance**2 + individual_y_distance**2)
+
+        index_of_closest_cluster.append(min(distances, key=distances.get))
+
+    df["Previous Cluster"] = index_of_closest_cluster
+
+    previous_clustering = df.groupby(
+        df["Previous Cluster"]).mean()[[column_x, column_y]]
+    previous_clustering = previous_clustering.sort_values(by = column_x).reset_index(drop= True)
+
+    fig, ax = plt.subplots(2, figsize = (6,12))
+    for n in range(0, n_clusters):
+        ax[0].scatter(df[df["Previous Cluster"] == n][column_x]
+                    df[df["Previous Cluster"] == n][column_y],
+                    label = "Cluster " + str(n+1))    
+        
+    ax[0].scatter(x =initial_cluster_centroids[column_x], 
+                y = initial_cluster_centroids[column_y], 
+                c = "red", s = 200,
+                label = 'Centroids')
+    ax[0].set_title("Metrics for Playlist with Initial Nonrandom Clusters")
+    ax[0].set_xlabel(column_x)
+    ax[0].set_xlim([0, 1])
+    ax[0].set_ylabel(column_y)
+    ax[0].set_ylim([0, 1])
+    ax[0].legend();
+        
+
+    iterations = 0
+    max_iter = 300
+
+
+    while iterations <= max_iter:
+
+        
+        index_of_closest_cluster = []
+        for song_index, song_row in df[[column_x, column_y]].iterrows():
+            distances = {}
+            for centroid_index, centroid_row in previous_clustering.iterrows():
+                individual_x_distance = song_row[column_x] - centroid_row[column_x]
+                individual_y_distance = song_row[column_y] - centroid_row[column_y]
+                distances[centroid_index] = np.sqrt(individual_x_distance**2 + individual_y_distance**2)
+            index_of_closest_cluster.append(min(distances, key=distances.get))
+        df["Current Cluster"] = index_of_closest_cluster
+        current_clustering = df.groupby(
+            df["Current Cluster"]).mean()[[column_x, column_y]]
+        current_clustering = current_clustering.sort_values(by = column_x).reset_index(drop = True)
+        
+      
+        iterations += 1
+        
+    
+        if df["Previous Cluster"].equals(df["Current Cluster"]) | previous_clustering.sort_values(by = column_x).equals(current_clustering.sort_values(by = column_x)):
+            
+          
+            df.drop(columns = ["Previous Cluster"], inplace = True)
+            iterations -= 1
+            print("The model has been trained in", iterations, "iterations")
+            iterations = 301
+        
+       
+        else:
+            df["Previous Cluster"] = df["Current Cluster"]
+            previous_clustering = current_clustering
+
+   
+    for n in range(0, n_clusters):
+        ax[1].scatter(df[df["Current Cluster"] == n][column_x], 
+                    df[df["Current Cluster"] == n][column_y], 
+                    label = "Cluster " + str(n + 1))
+
+    ax[1].scatter(current_clustering[column_x],
+                current_clustering[column_y],
+                c = "red", s = 200,
+                label = 'Centroids')
+    ax[1].set_title("Metrics for Playlist with Final Nonrandom Clusters")
+    ax[1].set_xlabel(column_x)
+    ax[1].set_xlim([0, 1])
+    ax[1].set_ylabel(column_y)
+    ax[1].set_ylim([0, 1])
+    ax[1].legend();
